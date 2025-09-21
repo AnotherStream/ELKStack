@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(dir)",
+      "Bash(dir scripts)",
+      "Bash(python:*)",
+      "Bash(elk_backup.bat help)",
+      "Bash(./elk_backup.sh:*)",
+      "Bash(./elk_manager.sh:*)",
+      "Bash(python3 scripts/elk_manager.py kibana-export-savedobject:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

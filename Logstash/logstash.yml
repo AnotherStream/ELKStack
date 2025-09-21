@@ -1,0 +1,28 @@
+http.host: "0.0.0.0"
+http.port: 9600
+
+# パス設定
+path.data: /usr/share/logstash/data
+path.logs: /usr/share/logstash/logs
+path.settings: /usr/share/logstash/config
+
+# パイプライン設定
+pipeline.workers: 2
+pipeline.batch.size: 125
+pipeline.batch.delay: 50
+
+# 監視設定
+monitoring.enabled: true
+monitoring.elasticsearch.hosts: ["http://elasticsearch:9200"]
+
+# ログ設定
+log.level: info
+log.format: plain
+
+# その他設定
+config.reload.automatic: true
+config.reload.interval: 3s
+
+# デッドレターキューの設定
+dead_letter_queue.enable: true
+dead_letter_queue.max_bytes: 1024mb

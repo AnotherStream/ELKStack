@@ -1,0 +1,32 @@
+cluster.name: "elk-cluster"
+node.name: "elasticsearch"
+
+# ネットワーク設定
+network.host: 0.0.0.0
+http.port: 9200
+transport.port: 9300
+
+# ディスカバリー設定（シングルノード）
+discovery.type: single-node
+
+# パス設定
+path.data: /usr/share/elasticsearch/data
+path.logs: /usr/share/elasticsearch/logs
+
+# メモリ設定
+bootstrap.memory_lock: true
+
+# セキュリティ設定（開発環境用）
+xpack.security.enabled: false
+xpack.security.enrollment.enabled: false
+xpack.security.http.ssl.enabled: false
+xpack.security.transport.ssl.enabled: false
+
+# 監視設定
+xpack.monitoring.collection.enabled: true
+
+# インデックス設定
+action.auto_create_index: "+*"
+
+# ログレベル設定
+logger.level: INFO

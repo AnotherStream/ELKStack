@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_VERSION}
+    container_name: elasticsearch
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=elk-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms${ELASTICSEARCH_HEAP_SIZE} -Xmx${ELASTICSEARCH_HEAP_SIZE}"
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./Volumes/Elasticsearch/data:/usr/share/elasticsearch/data
+      - ./Volumes/Elasticsearch/snapshots:/usr/share/elasticsearch/data/snapshots
+      - ./Elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+    ports:
+      - "${ELASTICSEARCH_PORT}:9200"
+      - "${ELASTICSEARCH_TRANSPORT_PORT}:9300"
+    networks:
+      - elk-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:${LOGSTASH_VERSION}
+    container_name: logstash
+    volumes:
+      - ./Logstash/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./Logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro
+      - ./Logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./Volumes/Logstash/data:/usr/share/logstash/data
+    ports:
+      - "${LOGSTASH_BEATS_PORT}:5044"
+      - "${LOGSTASH_TCP_PORT}:5000/tcp"
+      - "${LOGSTASH_UDP_PORT}:5000/udp"
+      - "${LOGSTASH_HTTP_PORT}:9600"
+    environment:
+      LS_JAVA_OPTS: "-Xmx${LOGSTASH_HEAP_SIZE} -Xms${LOGSTASH_HEAP_SIZE}"
+    networks:
+      - elk-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9600/_node/stats || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${KIBANA_VERSION}
+    container_name: kibana
+    ports:
+      - "${KIBANA_PORT}:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    volumes:
+      - ./Kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+      - ./Volumes/Kibana/data:/usr/share/kibana/data
+    networks:
+      - elk-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  elk-network:
+    driver: bridge
+
+# 名前付きボリュームは使用せず、ホストディレクトリマウントを使用

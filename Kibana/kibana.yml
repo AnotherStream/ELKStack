@@ -1,0 +1,31 @@
+server.name: "kibana"
+server.host: "0.0.0.0"
+server.port: 5601
+
+# Elasticsearch設定
+elasticsearch.hosts: ["http://elasticsearch:9200"]
+elasticsearch.username: ""
+elasticsearch.password: ""
+
+# セキュリティ設定（開発環境用）
+xpack.security.enabled: false
+xpack.encryptedSavedObjects.encryptionKey: "something_at_least_32_characters_long"
+
+# 監視設定
+monitoring.ui.container.elasticsearch.enabled: true
+monitoring.kibana.collection.enabled: true
+
+# ログ設定
+logging.appenders.console.type: console
+logging.appenders.console.layout.type: json
+logging.root.level: info
+
+# 国際化設定
+i18n.locale: "ja-JP"
+
+# UI設定
+map.includeElasticMapsService: false
+server.publicBaseUrl: "http://localhost:5601"
+
+# データビュー設定
+data.search.aggs.shardSize: 10000
